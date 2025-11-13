@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School Chatbot - OAV Patharchepa</title>
+
+  <style>
+    body {
+      background-color: #000;
+      color: white;
+      font-family: "Poppins", sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #004aad, #0a0a0a);
+      color: white;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 5px;
+    }
+
+    h2 {
+      font-size: 20px;
+      color: #ffcc00;
+      margin-top: 0;
+    }
+
+    .credit {
+      font-size: 16px;
+      color: #00ffaa;
+      font-weight: 500;
+    }
+
+    main {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .chat-container {
+      background: #1a1a1a;
+      border: 2px solid #00ffaa;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      box-shadow: 0 0 25px #00ffaa50;
+    }
+
+    .chat-box {
+      height: 350px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      background-color: #0a0a0a;
+      margin-bottom: 10px;
+    }
+
+    .bot-msg, .user-msg {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 12px;
+      line-height: 1.5;
+      max-width: 80%;
+    }
+
+    .bot-msg {
+      background: #004aad;
+      color: #fff;
+      align-self: flex-start;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    .user-msg {
+      background: #00ffaa;
+      color: #000;
+      align-self: flex-end;
+      margin-left: auto;
+      animation: fadeIn 0.4s ease-in;
+    }
+
+    .input-area {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      background: #222;
+      color: white;
+    }
+
+    .input-area button {
+      padding: 10px 18px;
+      border: none;
+      background: #00ffaa;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .input-area button:hover {
+      background: #00cc88;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>ODISHA ADARSHA VIDYALAYA, PATHARCHEPA, BALANGIR</h1>
+    <h2>SCIENCE EXHIBITION PROJECT</h2>
+    <p class="credit">By <b>Sugyan Khamari</b> <br> Class: XI (C)</p>
+  </header>
+
+  <main>
+    <div class="chat-container">
+      <div class="chat-box" id="chat-box">
+        <div class="bot-msg">👋 Hello! I'm your School Chatbot. You can ask me about school info or general knowledge questions.</div>
+      </div>
+      <div class="input-area">
+        <input type="text" id="user-input" placeholder="Ask me anything..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const responses = {
+      "prime minister": "The Prime Minister of India is Narendra Modi.",
+      "president": "The President of India is Droupadi Murmu.",
+      "finance minister": "The Finance Minister of India is Nirmala Sitharaman.",
+      "education minister": "The Education Minister of India is Dharmendra Pradhan.",
+      "defence minister": "The Defence Minister of India is Rajnath Singh.",
+      "school": "This is Odisha Adarsha Vidyalaya, Patharchepa, Balangir.",
+      "principal": "The Principal of OAV Patharchepa is Mr. K. Jhankar.",
+      "students": "There are around 500 students in our school.",
+      "states in india": "There are 28 states and 8 union territories in India.",
+      "how many states": "India has 28 states and 8 union territories.",
+      "union territories": "India has 8 union territories.",
+      "countries in world": "There are 195 countries in the world — 193 UN members and 2 observer states (Vatican City and Palestine).",
+      "national animal": "The national animal of India is the Bengal Tiger.",
+      "national bird": "The national bird of India is the Indian Peacock.",
+      "national flower": "The national flower of India is the Lotus.",
+      "national anthem": "The national anthem of India is 'Jana Gana Mana'.",
+      "national song": "The national song of India is 'Vande Mataram'.",
+      "national fruit": "The national fruit of India is Mango.",
+      "national game": "The national game of India is Hockey.",
+      "independence": "India got its independence on 15th August 1947."
+    };
+
+    const stateCapitals = {
+      "andhra pradesh": "Amaravati",
+      "arunachal pradesh": "Itanagar",
+      "assam": "Dispur",
+      "bihar": "Patna",
+      "chhattisgarh": "Raipur",
+      "goa": "Panaji",
+      "gujarat": "Gandhinagar",
+      "haryana": "Chandigarh",
+      "himachal pradesh": "Shimla",
+      "jharkhand": "Ranchi",
+      "karnataka": "Bengaluru",
+      "kerala": "Thiruvananthapuram",
+      "madhya pradesh": "Bhopal",
+      "maharashtra": "Mumbai",
+      "manipur": "Imphal",
+      "meghalaya": "Shillong",
+      "mizoram": "Aizawl",
+      "nagaland": "Kohima",
+      "odisha": "Bhubaneswar",
+      "punjab": "Chandigarh",
+      "rajasthan": "Jaipur",
+      "sikkim": "Gangtok",
+      "tamil nadu": "Chennai",
+      "telangana": "Hyderabad",
+      "tripura": "Agartala",
+      "uttar pradesh": "Lucknow",
+      "uttarakhand": "Dehradun",
+      "west bengal": "Kolkata"
+    };
+
+    function sendMessage() {
+      const input = document.getElementById("user-input");
+      const chatBox = document.getElementById("chat-box");
+      const userText = input.value.trim().toLowerCase();
+      if (!userText) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "user-msg";
+      userMsg.textContent = input.value;
+      chatBox.appendChild(userMsg);
+
+      let botReply = "I'm sorry, I don't have information about that.";
+
+      if (userText.includes("principle") || userText.includes("princepal")) {
+        botReply = "The Principal of OAV Patharchepa is Mr. K. Jhankar.";
+      }
+
+      for (const key in responses) {
+        if (userText.includes(key)) {
+          botReply = responses[key];
+          break;
+        }
+      }
+
+      for (const state in stateCapitals) {
+        if (userText.includes(state) && userText.includes("capital")) {
+          botReply = `The capital of ${state.charAt(0).toUpperCase() + state.slice(1)} is ${stateCapitals[state]}.`;
+          break;
+        }
+      }
+
+      const botMsg = document.createElement("div");
+      botMsg.className = "bot-msg";
+      botMsg.textContent = botReply;
+      chatBox.appendChild(botMsg);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
