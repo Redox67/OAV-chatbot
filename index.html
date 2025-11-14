@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>School Chatbot - OAV Patharchepa</title>
+
 <style>
     body {
         font-family: 'Poppins', sans-serif;
@@ -20,7 +21,6 @@
         color: #00eaff;
         font-size: 1.6em;
         font-weight: bold;
-        letter-spacing: 1px;
         text-shadow: 0 0 10px #00eaff;
     }
 
@@ -118,20 +118,23 @@
 </head>
 <body>
 
-<header>
-    ODISHA ADARSHA VIDYALAYA, PATHARCHEPA, BALANGIR
-</header>
+<header>ODISHA ADARSHA VIDYALAYA, PATHARCHEPA, BALANGIR</header>
+
 <p class="project-info">
     SCIENCE EXHIBITION PROJECT<br>
-    <strong>By Sugyan Khamari | Class: XI(C)</strong>
+    <strong>By Sugyan Khamari</strong>
 </p>
 
 <div class="chat-container">
     <div class="chat-box" id="chatBox">
-        <div class="chat-message bot">👋 Hello! I’m your school chatbot. You can ask me questions like “Who is the Prime Minister of India?” or “What’s the capital of Odisha?”.</div>
+        <div class="chat-message bot">
+            👋 Hello! I’m your school chatbot. 
+            Ask me GK questions, ministers' names, state capitals, or tell me your roll number (1000–1050) to know your seating arrangement.
+        </div>
     </div>
+
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="Type your question here...">
+        <input type="text" id="userInput" placeholder="Type here...">
         <button onclick="sendMessage()">Send</button>
         <button class="mic-btn" onclick="startListening()">🎤</button>
     </div>
@@ -140,145 +143,195 @@
 <footer>© 2025 OAV Patharchepa | Developed for Science Exhibition</footer>
 
 <script>
-    const chatBox = document.getElementById("chatBox");
-    const input = document.getElementById("userInput");
+/* ---------------------------------
+       SEATING (1000–1050)
+---------------------------------- */
+const seating = {
+"1000": {"floor":"1","class":"VI","section":"A","table":"2"},
+"1001": {"floor":"1","class":"VI","section":"A","table":"1"},
+"1002": {"floor":"2","class":"IX","section":"A","table":"1"},
+"1003": {"floor":"1","class":"XII","section":"B","table":"9"},
+"1004": {"floor":"2","class":"VIII","section":"B","table":"5"},
+"1005": {"floor":"2","class":"VIII","section":"B","table":"4"},
+"1006": {"floor":"2","class":"VIII","section":"B","table":"3"},
+"1007": {"floor":"2","class":"VIII","section":"B","table":"2"},
+"1008": {"floor":"2","class":"VIII","section":"B","table":"1"},
+"1009": {"floor":"1","class":"VII","section":"A","table":"1"},
 
-    const answers = {
-        "prime minister": "The Prime Minister of India is Narendra Modi.",
-        "president": "The President of India is Droupadi Murmu.",
-        "finance minister": "The Finance Minister of India is Nirmala Sitharaman.",
-        "education minister": "The Education Minister of India is Dharmendra Pradhan.",
-        "defence minister": "The Defence Minister of India is Rajnath Singh.",
-        "principal": "The Principal of OAV Patharchepa is Mr. K. Jhankar.",
-        "students": "There are about 500 students in OAV Patharchepa.",
-        "states": "India has 28 states and 8 Union Territories.",
-        "countries in india": "India is one single country, not made up of multiple countries 😊.",
-        "how many countries": "India is one country, not made up of others."
+"1010": {"floor":"1","class":"VII","section":"A","table":"2"},
+"1011": {"floor":"1","class":"VII","section":"A","table":"3"},
+"1012": {"floor":"1","class":"VII","section":"A","table":"4"},
+"1013": {"floor":"1","class":"VII","section":"A","table":"5"},
+"1014": {"floor":"1","class":"VII","section":"A","table":"6"},
+"1015": {"floor":"1","class":"VII","section":"A","table":"7"},
+"1016": {"floor":"1","class":"VII","section":"A","table":"8"},
+"1017": {"floor":"1","class":"VII","section":"A","table":"9"},
+"1018": {"floor":"1","class":"VII","section":"A","table":"10"},
+"1019": {"floor":"1","class":"VII","section":"A","table":"11"},
+
+"1020": {"floor":"1","class":"VIII","section":"A","table":"1"},
+"1021": {"floor":"1","class":"VIII","section":"A","table":"2"},
+"1022": {"floor":"1","class":"VIII","section":"A","table":"3"},
+"1023": {"floor":"1","class":"VIII","section":"A","table":"4"},
+"1024": {"floor":"1","class":"VIII","section":"A","table":"5"},
+"1025": {"floor":"1","class":"VIII","section":"A","table":"6"},
+"1026": {"floor":"1","class":"VIII","section":"A","table":"7"},
+"1027": {"floor":"1","class":"VIII","section":"A","table":"8"},
+"1028": {"floor":"1","class":"VIII","section":"A","table":"9"},
+"1029": {"floor":"1","class":"VIII","section":"A","table":"10"},
+
+"1030": {"floor":"2","class":"IX","section":"B","table":"1"},
+"1031": {"floor":"2","class":"IX","section":"B","table":"2"},
+"1032": {"floor":"2","class":"IX","section":"B","table":"3"},
+"1033": {"floor":"2","class":"IX","section":"B","table":"4"},
+"1034": {"floor":"2","class":"IX","section":"B","table":"5"},
+"1035": {"floor":"2","class":"IX","section":"B","table":"6"},
+"1036": {"floor":"2","class":"IX","section":"B","table":"7"},
+"1037": {"floor":"2","class":"IX","section":"B","table":"8"},
+"1038": {"floor":"2","class":"IX","section":"B","table":"9"},
+"1039": {"floor":"2","class":"IX","section":"B","table":"10"},
+
+"1040": {"floor":"2","class":"X","section":"A","table":"1"},
+"1041": {"floor":"2","class":"X","section":"A","table":"2"},
+"1042": {"floor":"2","class":"X","section":"A","table":"3"},
+"1043": {"floor":"2","class":"X","section":"A","table":"4"},
+"1044": {"floor":"2","class":"X","section":"A","table":"5"},
+"1045": {"floor":"2","class":"X","section":"A","table":"6"},
+"1046": {"floor":"2","class":"X","section":"A","table":"7"},
+"1047": {"floor":"2","class":"X","section":"A","table":"8"},
+"1048": {"floor":"2","class":"X","section":"A","table":"9"},
+"1049": {"floor":"2","class":"X","section":"A","table":"10"},
+
+"1050": {"floor":"1","class":"XII","section":"A","table":"1"}
+};
+
+/* ---------------------------------
+       MINISTERS & GENERAL GK
+---------------------------------- */
+const answers = {
+"prime minister": "The Prime Minister of India is Narendra Modi.",
+"president": "The President of India is Droupadi Murmu.",
+"vice president": "The Vice President of India is Jagdeep Dhankhar.",
+"home minister": "The Home Minister of India is Amit Shah.",
+"finance minister": "The Finance Minister of India is Nirmala Sitharaman.",
+"education minister": "The Education Minister of India is Dharmendra Pradhan.",
+"defence minister": "The Defence Minister of India is Rajnath Singh.",
+"railway minister": "The Railway Minister of India is Ashwini Vaishnaw.",
+"health minister": "The Health Minister of India is Dr. Mansukh Mandaviya.",
+"environment minister": "Environment Minister of India is Bhupender Yadav.",
+
+"principal": "The Principal of OAV Patharchepa is Mr. K. Jhankar.",
+"students": "There are about 500 students in OAV Patharchepa.",
+"states": "India has 28 states and 8 Union Territories.",
+"how many countries": "India is one country 😊."
+};
+
+/* ---------------------------------
+        STATE CAPITALS
+---------------------------------- */
+const capitals = {
+"andhra pradesh":"Amaravati","arunachal pradesh":"Itanagar","assam":"Dispur",
+"bihar":"Patna","chhattisgarh":"Raipur","goa":"Panaji","gujarat":"Gandhinagar",
+"haryana":"Chandigarh","himachal pradesh":"Shimla","jharkhand":"Ranchi",
+"karnataka":"Bengaluru","kerala":"Thiruvananthapuram","madhya pradesh":"Bhopal",
+"maharashtra":"Mumbai","manipur":"Imphal","meghalaya":"Shillong","mizoram":"Aizawl",
+"nagaland":"Kohima","odisha":"Bhubaneswar","punjab":"Chandigarh","rajasthan":"Jaipur",
+"sikkim":"Gangtok","tamil nadu":"Chennai","telangana":"Hyderabad","tripura":"Agartala",
+"uttar pradesh":"Lucknow","uttarakhand":"Dehradun","west bengal":"Kolkata"
+};
+
+/* ---------------------------------
+           GREETINGS
+---------------------------------- */
+const greetings = ["hi","hello","hey","good morning","good evening","good afternoon"];
+
+const chatBox = document.getElementById("chatBox");
+const input = document.getElementById("userInput");
+
+/* SEND MESSAGE ----------------------------------- */
+function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    addMessage(text, "user");
+    input.value = "";
+    processMessage(text);
+}
+
+/* PROCESS MESSAGE -------------------------------- */
+function processMessage(text) {
+    const lower = text.toLowerCase();
+    let reply = "";
+
+    if (greetings.some(g => lower.includes(g))) {
+        reply = "Hello! 😊 How can I help you?";
+        return botReply(reply);
+    }
+
+    const rollMatch = lower.match(/\b\d{3,4}\b/);
+    if (rollMatch) {
+        const roll = rollMatch[0];
+        if (seating[roll]) {
+            const s = seating[roll];
+            reply = `Roll No ${roll}: Floor ${s.floor}, Class ${s.class}, Section ${s.section}, Table ${s.table}.`;
+        } else reply = "Roll number not found.";
+        return botReply(reply);
+    }
+
+    for (const st in capitals) {
+        if (lower.includes(st)) {
+            reply = `The capital of ${st.toUpperCase()} is ${capitals[st]}.`;
+            return botReply(reply);
+        }
+    }
+
+    for (const key in answers) {
+        if (lower.includes(key)) {
+            reply = answers[key];
+            return botReply(reply);
+        }
+    }
+
+    botReply("I'm not sure about that 🤔, but I'm learning!");
+}
+
+/* ADD MESSAGE ------------------------------------- */
+function addMessage(text, sender) {
+    const msg = document.createElement("div");
+    msg.classList.add("chat-message", sender);
+    msg.innerText = text;
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+/* BOT REPLY + SPEAK ------------------------------- */
+function botReply(text) {
+    addMessage(text, "bot");
+    speak(text);
+}
+
+/* VOICE INPUT ------------------------------------- */
+function startListening() {
+    if (!('webkitSpeechRecognition' in window)) {
+        return alert("Voice input not supported.");
+    }
+    const recog = new webkitSpeechRecognition();
+    recog.lang = "en-IN";
+    recog.start();
+
+    recog.onresult = (e) => {
+        const speech = e.results[0][0].transcript;
+        addMessage("🎤 " + speech, "user");
+        processMessage(speech);
     };
+}
 
-    const capitals = {
-        "andhra pradesh": "Amaravati",
-        "arunachal pradesh": "Itanagar",
-        "assam": "Dispur",
-        "bihar": "Patna",
-        "chhattisgarh": "Raipur",
-        "goa": "Panaji",
-        "gujarat": "Gandhinagar",
-        "haryana": "Chandigarh",
-        "himachal pradesh": "Shimla",
-        "jharkhand": "Ranchi",
-        "karnataka": "Bengaluru",
-        "kerala": "Thiruvananthapuram",
-        "madhya pradesh": "Bhopal",
-        "maharashtra": "Mumbai",
-        "manipur": "Imphal",
-        "meghalaya": "Shillong",
-        "mizoram": "Aizawl",
-        "nagaland": "Kohima",
-        "odisha": "Bhubaneswar",
-        "punjab": "Chandigarh",
-        "rajasthan": "Jaipur",
-        "sikkim": "Gangtok",
-        "tamil nadu": "Chennai",
-        "telangana": "Hyderabad",
-        "tripura": "Agartala",
-        "uttar pradesh": "Lucknow",
-        "uttarakhand": "Dehradun",
-        "west bengal": "Kolkata"
-    };
-
-    const greetings = ["hi", "hello", "hey", "good morning", "good evening", "good afternoon"];
-
-    function sendMessage() {
-        const userText = input.value.trim();
-        if (!userText) return;
-        addMessage(userText, "user");
-        input.value = "";
-        processMessage(userText);
-    }
-
-    function processMessage(text) {
-        const lower = text.toLowerCase();
-        let reply = "";
-
-        if (greetings.some(g => lower.includes(g))) {
-            reply = "Hello there! 😊 How can I help you today?";
-        } else {
-            for (const state in capitals) {
-                if (lower.includes(state)) {
-                    reply = `The capital of ${state.charAt(0).toUpperCase() + state.slice(1)} is ${capitals[state]}.`;
-                    break;
-                }
-            }
-        }
-
-        if (!reply) {
-            for (const key in answers) {
-                if (lower.includes(key)) {
-                    reply = answers[key];
-                    break;
-                }
-            }
-        }
-
-        if (!reply) {
-            reply = "I'm not sure about that yet 🤔, but I'm still learning!";
-        }
-
-        addMessage(reply, "bot");
-        speak(reply);
-    }
-
-    function addMessage(text, sender) {
-        const msg = document.createElement("div");
-        msg.classList.add("chat-message", sender);
-        msg.innerText = text;
-        chatBox.appendChild(msg);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // 🎙️ Speech Recognition
-    function startListening() {
-        if (!('webkitSpeechRecognition' in window)) {
-            alert("Sorry, your browser doesn't support speech recognition 😢");
-            return;
-        }
-
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = "en-IN";
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.start();
-
-        recognition.onresult = (event) => {
-            const speech = event.results[0][0].transcript;
-            addMessage("🎤 " + speech, "user");
-            processMessage(speech);
-        };
-
-        recognition.onerror = () => {
-            addMessage("❌ Voice recognition error. Please try again.", "bot");
-        };
-    }
-
-    // 🗣️ Text-to-Speech (Soft Female Voice)
-    function speak(text) {
-        if ('speechSynthesis' in window) {
-            const voices = window.speechSynthesis.getVoices();
-            const femaleVoice = voices.find(v => 
-                v.name.includes('Female') || v.name.includes('Google UK English Female') || v.name.includes('en-IN')
-            );
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = "en-IN";
-            utter.pitch = 1;
-            utter.rate = 1;
-            utter.voice = femaleVoice || voices[0];
-            window.speechSynthesis.speak(utter);
-        }
-    }
-
-    // Load voices properly (some browsers delay them)
-    window.speechSynthesis.onvoiceschanged = () => {};
+/* TEXT-TO-SPEECH ---------------------------------- */
+function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-IN";
+    speechSynthesis.speak(utter);
+}
 </script>
 </body>
 </html>
