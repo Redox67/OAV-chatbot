@@ -1,163 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School Chatbot - OAV Patharchepa</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>School Chatbot - Seating with Excel</title>
+
+<!-- SheetJS for reading/writing Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #000;
-        color: #fff;
-        margin: 0;
-        padding: 0;
-    }
-
-    header {
-        text-align: center;
-        background: linear-gradient(90deg, #1a1a1a, #333);
-        padding: 20px;
-        color: #00eaff;
-        font-size: 1.6em;
-        font-weight: bold;
-        text-shadow: 0 0 10px #00eaff;
-    }
-
-    .project-info {
-        text-align: center;
-        margin-top: -10px;
-        font-size: 1em;
-        color: #ccc;
-    }
-
-    .school-info {
-        text-align: center;
-        margin-top: 5px;
-        color: #bbbbbb;
-        font-size: 0.95em;
-    }
-
-    .chat-container {
-        width: 90%;
-        max-width: 600px;
-        background-color: #111;
-        margin: 40px auto;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0px 0px 25px #00eaff40;
-    }
-
-    .chat-box {
-        height: 400px;
-        overflow-y: auto;
-        border: 1px solid #333;
-        border-radius: 10px;
-        padding: 15px;
-        background-color: #0a0a0a;
-    }
-
-    .chat-message {
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 10px;
-        line-height: 1.5;
-    }
-
-    .user {
-        background-color: #00eaff25;
-        text-align: right;
-        color: #a0e9ff;
-    }
-
-    .bot {
-        background-color: #00eaff10;
-        text-align: left;
-        color: #e0f7ff;
-    }
-
-    .input-area {
-        display: flex;
-        margin-top: 15px;
-    }
-
-    input {
-        flex: 1;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
-        outline: none;
-        background-color: #1a1a1a;
-        color: white;
-        font-size: 1em;
-    }
-
-    button {
-        background-color: #00eaff;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 20px;
-        margin-left: 10px;
-        color: #000;
-        cursor: pointer;
-        transition: 0.3s;
-        font-weight: bold;
-    }
-
-    button:hover {
-        background-color: #00b8d4;
-        transform: scale(1.05);
-    }
-
-    .mic-btn {
-        background-color: #222;
-        color: #00eaff;
-        border: 1px solid #00eaff80;
-    }
-
-    footer {
-        text-align: center;
-        margin-top: 30px;
-        color: #888;
-        font-size: 0.9em;
-    }
+  body { font-family: 'Poppins', sans-serif; background:#000; color:#fff; margin:0; padding:0;}
+  header{ text-align:center; background:linear-gradient(90deg,#1a1a1a,#333); padding:18px; color:#00eaff; font-size:1.4em; font-weight:bold; text-shadow:0 0 8px #00eaff;}
+  .project-info, .school-info { text-align:center; color:#ccc; margin:6px 0; }
+  .chat-container { width:94%; max-width:880px; margin:22px auto; background:#111; padding:18px; border-radius:14px; box-shadow:0 0 24px #00eaff33; }
+  .controls{ display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px;}
+  .left-controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .file-label{ display:inline-block; padding:8px 12px; border-radius:10px; background:#0b7f94; cursor:pointer; color:#000; font-weight:bold;}
+  input[type=file]{ display:none; }
+  .btn{ background:#00eaff; border:none; padding:8px 12px; border-radius:10px; color:#000; font-weight:bold; cursor:pointer;}
+  .status{ font-size:0.92em; color:#9fe8ff; }
+  .chat-box{ height:420px; overflow:auto; border-radius:10px; padding:12px; background:#0a0a0a; border:1px solid #222; }
+  .chat-message{ margin:10px 0; padding:10px; border-radius:10px; line-height:1.4; max-width:86%; word-wrap:break-word;}
+  .user{ background:#00eaff22; text-align:right; color:#a0e9ff; margin-left:auto;}
+  .bot{ background:#00eaff12; text-align:left; color:#e0f7ff; margin-right:auto;}
+  .input-area{ display:flex; gap:8px; margin-top:12px; }
+  input[type=text]{ flex:1; padding:10px; border-radius:10px; border:none; outline:none; background:#1a1a1a; color:#fff; font-size:1em;}
+  .mic-btn{ background:#222; color:#00eaff; border:1px solid #00eaff80; padding:8px 10px; border-radius:10px; cursor:pointer;}
+  footer{ text-align:center; color:#888; margin-top:14px; font-size:0.9em;}
+  .small{ font-size:0.87em; color:#ccc;}
+  .warn{ color:#ffcc66; }
+  .ok{ color:#9fe8ff; }
+  @media (max-width:520px){ .chat-box{ height:320px; } }
 </style>
 </head>
 <body>
 
 <header>ODISHA ADARSHA VIDYALAYA, PATHARCHEPA, BALANGIR</header>
-
-<p class="project-info">
-    SCIENCE EXHIBITION PROJECT<br>
-    <strong>By Sugyan Khamari</strong>
-</p>
-
-<p class="school-info">
-    Odisha Adarsha Vidyalaya, Patharchepa was established in the year <strong>2016</strong>.
-</p>
+<p class="project-info">SEATING CHATBOT — Upload seating Excel and students type roll no to get seat.</p>
+<p class="school-info">Odisha Adarsha Vidyalaya, Patharchepa was established in the year <strong>2016</strong>.</p>
 
 <div class="chat-container">
-    <div class="chat-box" id="chatBox">
-        <div class="chat-message bot">
-            👋 Hello! I’m your school chatbot. 
-            Ask me GK questions, ministers' names, state capitals, or tell me your roll number (1000–1050) to know your seating arrangement.
-        </div>
+
+  <div class="controls">
+    <div class="left-controls">
+      <label class="file-label" title="Upload seating Excel (many header variants supported)">
+        Upload Seating Excel
+        <input id="excelFile" type="file" accept=".xlsx,.xls,.csv" />
+      </label>
+
+      <button id="downloadTemplateBtn" class="btn" title="Download sample template">Download Template</button>
+      <button id="clearExcelBtn" class="btn" title="Clear loaded seating">Clear Seating</button>
+      <div id="excelStatus" class="status">No seating uploaded.</div>
     </div>
 
-    <div class="input-area">
-        <input type="text" id="userInput" placeholder="Type here...">
-        <button onclick="sendMessage()">Send</button>
-        <button class="mic-btn" onclick="startListening()">🎤</button>
+    <div class="right-controls small">
+      <div>Expected keys (auto-mapped): <strong>roll, floor, class, section, table</strong></div>
+      <div class="small warn">We auto-accept common variants like "Roll No", "roll_no", "Rno", "Desk", "Table No".</div>
     </div>
+  </div>
+
+  <div id="chatBox" class="chat-box">
+    <div class="chat-message bot">
+      👋 Hello! Teachers: upload seating Excel (template available). Students: type your roll number (e.g., <em>1004</em>) or say it with the mic and I'll reply with your floor, class, section and table.
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input id="userInput" type="text" placeholder="Type roll number or question..." />
+    <button onclick="sendMessage()" class="btn">Send</button>
+    <button class="mic-btn" onclick="startListening()">🎤</button>
+  </div>
 </div>
 
-<footer>© 2025 OAV Patharchepa | Developed for Science Exhibition</footer>
+<footer>© 2025 OAV Patharchepa | Seating Chatbot</footer>
 
 <script>
-/* ---------------------------------
-       SEATING (1000–1050)
----------------------------------- */
-const seating = {
+/* --------------------------
+  Header mapping & utilities
+   -------------------------- */
+
+/*
+We will accept many header variants and map them to required fields:
+required fields: roll, floor, class, section, table
+
+Common alias lists below (all matched case-insensitive, spaces/underscores/dots ignored)
+*/
+const headerAliases = {
+  roll: ['roll','rollno','roll_no','roll no','rollnumber','roll number','rno','studentid','student id','id'],
+  floor: ['floor','floorno','floor_no','floor no','room','roomno','room_no','level'],
+  class: ['class','classname','class_name','class name','grade','standard','std'],
+  section: ['section','sec','section_name','section name','group'],
+  table: ['table','table_no','table no','table_no','desk','desk_no','desk no','seat','seat_no','seat no']
+};
+
+// normalize header string: lowercase, trim, remove dots/underscores and extra spaces
+function normalizeHeaderKey(h) {
+  return h.toString().toLowerCase().trim().replace(/[\.\_\-]/g,' ').replace(/\s+/g,' ');
+}
+
+function findFieldForHeader(headerNormalized) {
+  for (const field in headerAliases) {
+    const aliases = headerAliases[field];
+    for (const a of aliases) {
+      if (headerNormalized === a) return field;
+    }
+  }
+  // also try partial match (header contains alias)
+  for (const field in headerAliases) {
+    const aliases = headerAliases[field];
+    for (const a of aliases) {
+      if (headerNormalized.includes(a)) return field;
+    }
+  }
+  return null;
+}
+
+/* --------------------------
+  Excel upload & parsing
+   -------------------------- */
+
+let seatingMap = {}; // normalizedRoll -> {roll,floor,class,section,table}
+let excelRowsCount = 0;
+
+const fileInput = document.getElementById('excelFile');
+const excelStatus = document.getElementById('excelStatus');
+const chatBox = document.getElementById('chatBox');
+
+fileInput.addEventListener('change', handleExcelUpload);
+
+function handleExcelUpload(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      // get header row manually to analyze header names
+      const headerRow = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 0, defval: '' })[0] || [];
+      if (headerRow.length === 0) {
+        botReply('Uploaded sheet has no headers — please use the template or add headers.');
+        excelStatus.innerText = 'Upload failed: no headers.';
+        excelStatus.className = 'status warn';
+        return;
+      }
+
+      // Build mapping from original header -> normalized field name (roll,floor,...)
+      const headerMap = {}; // original -> field
+      const missingRequired = new Set(Object.keys(headerAliases));
+      headerRow.forEach(h => {
+        const hn = normalizeHeaderKey(h);
+        const mapped = findFieldForHeader(hn);
+        if (mapped) {
+          headerMap[h] = mapped;
+          missingRequired.delete(mapped);
+        } else {
+          headerMap[h] = null; // unknown column, keep but unmapped
+        }
+      });
+
+      // Parse sheet to JSON using headers (object with original header names as keys)
+      const rawJson = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+      // Convert rows into normalized rows using headerMap
+      seatingMap = {};
+      rawJson.forEach((row, idx) => {
+        const normalized = {}; // keys: roll,floor,class,section,table (if present)
+        for (const origHeader in row) {
+          if (!Object.prototype.hasOwnProperty.call(row, origHeader)) continue;
+          const field = headerMap[origHeader];
+          if (field) normalized[field] = row[origHeader];
+        }
+        // If roll present, add to seatingMap
+        if (normalized.roll !== undefined && normalized.roll !== '') {
+          const r = normalizeRoll(normalized.roll);
+          seatingMap[r] = {
+            roll: String(normalized.roll),
+            floor: String(normalized.floor || ''),
+            class: String(normalized.class || ''),
+            section: String(normalized.section || ''),
+            table: String(normalized.table || '')
+          };
+        }
+      });
+
+      excelRowsCount = Object.keys(seatingMap).length;
+
+      if (missingRequired.size > 0) {
+        botReply('Uploaded file partially mapped. Missing headers for: ' + Array.from(missingRequired).join(', ') + '. Please use the template or rename columns. Rows loaded: ' + excelRowsCount + '.');
+        excelStatus.innerText = 'Partial mapping (' + excelRowsCount + ' rows). Missing: ' + Array.from(missingRequired).join(', ');
+        excelStatus.className = 'status warn';
+      } else {
+        botReply('Seating Excel uploaded & auto-mapped successfully! Rows loaded: ' + excelRowsCount + '.');
+        excelStatus.innerText = 'Seating loaded (' + excelRowsCount + ' rows)';
+        excelStatus.className = 'status ok';
+      }
+
+    } catch (err) {
+      console.error(err);
+      botReply('Failed to read Excel file. Make sure it is valid .xlsx/.xls/.csv.');
+      excelStatus.innerText = 'Upload failed.';
+      excelStatus.className = 'status warn';
+    }
+  };
+
+  // support csv: readAsText; for xlsx use readAsArrayBuffer
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.csv')) {
+    reader.readAsText(file);
+    reader.onload = (e) => {
+      try {
+        const text = e.target.result;
+        const workbook = XLSX.read(text, { type: 'string' });
+        // reuse code by creating a binary array buffer and calling same parsing above
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        // create a new sheet object with parsed csv and call the same logic
+        // for simplicity, write temp workbook to binary and re-run main logic:
+        const tempWB = { SheetNames: workbook.SheetNames, Sheets: workbook.Sheets };
+        // We'll parse using sheet directly here
+        // Build headerRow and row objects similar to above:
+        const headerRow = XLSX.utils.sheet_to_json(ws, { header: 1, range: 0, defval: '' })[0] || [];
+        if (headerRow.length === 0) {
+          botReply('Uploaded CSV has no headers — please use the template.');
+          excelStatus.innerText = 'Upload failed: no headers.';
+          excelStatus.className = 'status warn';
+          return;
+        }
+        // Build headerMap
+        const headerMap = {};
+        const missingRequired = new Set(Object.keys(headerAliases));
+        headerRow.forEach(h => {
+          const hn = normalizeHeaderKey(h);
+          const mapped = findFieldForHeader(hn);
+          if (mapped) { headerMap[h] = mapped; missingRequired.delete(mapped); } else headerMap[h] = null;
+        });
+        const rawJson = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        seatingMap = {};
+        rawJson.forEach((row) => {
+          const normalized = {};
+          for (const origHeader in row) {
+            if (!Object.prototype.hasOwnProperty.call(row, origHeader)) continue;
+            const field = headerMap[origHeader];
+            if (field) normalized[field] = row[origHeader];
+          }
+          if (normalized.roll !== undefined && normalized.roll !== '') {
+            const r = normalizeRoll(normalized.roll);
+            seatingMap[r] = {
+              roll: String(normalized.roll),
+              floor: String(normalized.floor || ''),
+              class: String(normalized.class || ''),
+              section: String(normalized.section || ''),
+              table: String(normalized.table || '')
+            };
+          }
+        });
+        excelRowsCount = Object.keys(seatingMap).length;
+        if (missingRequired.size > 0) {
+          botReply('CSV partially mapped. Missing headers: ' + Array.from(missingRequired).join(', ') + '. Rows loaded: ' + excelRowsCount + '.');
+          excelStatus.innerText = 'Partial mapping (' + excelRowsCount + ' rows). Missing: ' + Array.from(missingRequired).join(', ');
+          excelStatus.className = 'status warn';
+        } else {
+          botReply('CSV seating uploaded & mapped successfully! Rows loaded: ' + excelRowsCount + '.');
+          excelStatus.innerText = 'Seating loaded (' + excelRowsCount + ' rows)';
+          excelStatus.className = 'status ok';
+        }
+      } catch (err) {
+        console.error(err);
+        botReply('Error parsing CSV file.');
+        excelStatus.innerText = 'Upload failed.';
+        excelStatus.className = 'status warn';
+      }
+    };
+  } else {
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+/* Clear uploaded seating */
+document.getElementById('clearExcelBtn').addEventListener('click', () => {
+  seatingMap = {};
+  excelRowsCount = 0;
+  fileInput.value = '';
+  excelStatus.innerText = 'No seating uploaded.';
+  excelStatus.className = 'status';
+  botReply('Seating cleared. Upload a new seating Excel when ready.');
+});
+
+/* --------------------------
+  Template download (SheetJS)
+   -------------------------- */
+
+document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
+  // Create a sample workbook with required headers and one sample row
+  const headers = ['roll','floor','class','section','table'];
+  const sampleRow = ['1001','1','VI','A','2'];
+  const ws_data = [headers, sampleRow];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  XLSX.utils.book_append_sheet(wb, ws, 'SeatingTemplate');
+  const wbout = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+  const blob = new Blob([wbout], { type:'application/octet-stream' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Seating_Template.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  botReply('Sample template downloaded. Teachers: open it, edit rows, save and upload here. Make sure to keep headers.');
+});
+
+/* --------------------------
+  Chat UI + logic
+   -------------------------- */
+
+const input = document.getElementById('userInput');
+
+function addMessage(text, sender) {
+  const msg = document.createElement('div');
+  msg.classList.add('chat-message', sender);
+  msg.innerText = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function botReply(text) {
+  addMessage(text, 'bot');
+  speak(text);
+}
+
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  input.value = '';
+  processMessage(text);
+}
+
+/* Speech recognition (voice input) */
+function startListening() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    return alert('Voice input not supported in this browser.');
+  }
+  const Recog = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recog = new Recog();
+  recog.lang = 'en-IN';
+  recog.start();
+  recog.onresult = (e) => {
+    const speech = e.results[0][0].transcript;
+    addMessage('🎤 ' + speech, 'user');
+    processMessage(speech);
+  };
+  recog.onerror = (e) => {
+    console.error(e);
+    botReply('Voice input error.');
+  };
+}
+
+/* Text-to-speech for bot */
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-IN';
+  speechSynthesis.speak(utter);
+}
+
+/* normalize roll string */
+function normalizeRoll(r) {
+  if (r === null || r === undefined) return '';
+  let s = String(r).trim();
+  s = s.replace(/\s+/g, '');
+  return s;
+}
+
+/* built-in fallback seating (your previous data) */
+const fallbackSeating = {
 "1000": {"floor":"1","class":"VI","section":"A","table":"2"},
 "1001": {"floor":"1","class":"VI","section":"A","table":"1"},
 "1002": {"floor":"2","class":"IX","section":"A","table":"1"},
@@ -168,7 +390,6 @@ const seating = {
 "1007": {"floor":"2","class":"VIII","section":"B","table":"2"},
 "1008": {"floor":"2","class":"VIII","section":"B","table":"1"},
 "1009": {"floor":"1","class":"VII","section":"A","table":"1"},
-
 "1010": {"floor":"1","class":"VII","section":"A","table":"2"},
 "1011": {"floor":"1","class":"VII","section":"A","table":"3"},
 "1012": {"floor":"1","class":"VII","section":"A","table":"4"},
@@ -179,7 +400,6 @@ const seating = {
 "1017": {"floor":"1","class":"VII","section":"A","table":"9"},
 "1018": {"floor":"1","class":"VII","section":"A","table":"10"},
 "1019": {"floor":"1","class":"VII","section":"A","table":"11"},
-
 "1020": {"floor":"1","class":"VIII","section":"A","table":"1"},
 "1021": {"floor":"1","class":"VIII","section":"A","table":"2"},
 "1022": {"floor":"1","class":"VIII","section":"A","table":"3"},
@@ -190,7 +410,6 @@ const seating = {
 "1027": {"floor":"1","class":"VIII","section":"A","table":"8"},
 "1028": {"floor":"1","class":"VIII","section":"A","table":"9"},
 "1029": {"floor":"1","class":"VIII","section":"A","table":"10"},
-
 "1030": {"floor":"2","class":"IX","section":"B","table":"1"},
 "1031": {"floor":"2","class":"IX","section":"B","table":"2"},
 "1032": {"floor":"2","class":"IX","section":"B","table":"3"},
@@ -201,7 +420,6 @@ const seating = {
 "1037": {"floor":"2","class":"IX","section":"B","table":"8"},
 "1038": {"floor":"2","class":"IX","section":"B","table":"9"},
 "1039": {"floor":"2","class":"IX","section":"B","table":"10"},
-
 "1040": {"floor":"2","class":"X","section":"A","table":"1"},
 "1041": {"floor":"2","class":"X","section":"A","table":"2"},
 "1042": {"floor":"2","class":"X","section":"A","table":"3"},
@@ -212,140 +430,109 @@ const seating = {
 "1047": {"floor":"2","class":"X","section":"A","table":"8"},
 "1048": {"floor":"2","class":"X","section":"A","table":"9"},
 "1049": {"floor":"2","class":"X","section":"A","table":"10"},
-
 "1050": {"floor":"1","class":"XII","section":"A","table":"1"}
 };
 
-/* ---------------------------------
-       MINISTERS & GENERAL GK
----------------------------------- */
-const answers = {
-"prime minister": "The Prime Minister of India is Narendra Modi.",
-"president": "The President of India is Droupadi Murmu.",
-"vice president": "The Vice President of India is Jagdeep Dhankhar.",
-"home minister": "The Home Minister of India is Amit Shah.",
-"finance minister": "The Finance Minister of India is Nirmala Sitharaman.",
-"education minister": "The Education Minister of India is Dharmendra Pradhan.",
-"defence minister": "The Defence Minister of India is Rajnath Singh.",
-"railway minister": "The Railway Minister of India is Ashwini Vaishnaw.",
-"health minister": "The Health Minister of India is Dr. Mansukh Mandaviya.",
-"environment minister": "Environment Minister of India is Bhupender Yadav.",
-
-"principal": "The Principal of OAV Patharchepa is Mr. K. Jhankar.",
-"students": "There are about 500 students in OAV Patharchepa.",
-"states": "India has 28 states and 8 Union Territories.",
-"how many countries": "India is one country 😊.",
-
-"academic incharge": "The Academic In-Charge of OAV Patharchepa is B. R. Karmi.",
-"exam incharge": "The Exam In-Charge of OAV Patharchepa is Alibha Deep."
-};
-
-/* ---------------------------------
-        STATE CAPITALS
----------------------------------- */
-const capitals = {
-"andhra pradesh":"Amaravati","arunachal pradesh":"Itanagar","assam":"Dispur",
-"bihar":"Patna","chhattisgarh":"Raipur","goa":"Panaji","gujarat":"Gandhinagar",
-"haryana":"Chandigarh","himachal pradesh":"Shimla","jharkhand":"Ranchi",
-"karnataka":"Bengaluru","kerala":"Thiruvananthapuram","madhya pradesh":"Bhopal",
-"maharashtra":"Mumbai","manipur":"Imphal","meghalaya":"Shillong","mizoram":"Aizawl",
-"nagaland":"Kohima","odisha":"Bhubaneswar","punjab":"Chandigarh","rajasthan":"Jaipur",
-"sikkim":"Gangtok","tamil nadu":"Chennai","telangana":"Hyderabad","tripura":"Agartala",
-"uttar pradesh":"Lucknow","uttarakhand":"Dehradun","west bengal":"Kolkata"
-};
-
-/* ---------------------------------
-           GREETINGS
----------------------------------- */
-const greetings = ["hi","hello","hey","good morning","good evening","good afternoon"];
-
-const chatBox = document.getElementById("chatBox");
-const input = document.getElementById("userInput");
-
-/* SEND MESSAGE ----------------------------------- */
-function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-    addMessage(text, "user");
-    input.value = "";
-    processMessage(text);
-}
-
-/* PROCESS MESSAGE -------------------------------- */
+/* process messages */
 function processMessage(text) {
-    const lower = text.toLowerCase();
-    let reply = "";
+  const lower = text.toLowerCase().trim();
 
-    if (greetings.some(g => lower.includes(g))) {
-        reply = "Hello! 😊 How can I help you?";
-        return botReply(reply);
+  // direct roll forms:
+  const rollMatch1 = lower.match(/^roll[:\s]*([0-9a-zA-Z\-\_]+)$/i); // "roll 1001" or "roll:1001"
+  const rollMatch2 = lower.match(/^\b([0-9]{2,6})\b$/); // just "1001"
+  if (rollMatch1 || rollMatch2) {
+    const raw = rollMatch1 ? rollMatch1[1] : rollMatch2[1];
+    const normalized = normalizeRoll(raw);
+    replySeatForRoll(normalized);
+    return;
+  }
+
+  // try find any 2-6 digit number inside text
+  const anyDigits = lower.match(/([0-9]{2,6})/);
+  if (anyDigits) {
+    const candidate = normalizeRoll(anyDigits[1]);
+    // if seating loaded, try direct match
+    if (Object.keys(seatingMap).length > 0) {
+      replySeatForRoll(candidate);
+      return;
     }
+  }
 
-    const rollMatch = lower.match(/\b\d{3,4}\b/);
-    if (rollMatch) {
-        const roll = rollMatch[0];
-        if (seating[roll]) {
-            const s = seating[roll];
-            reply = `Roll No ${roll}: Floor ${s.floor}, Class ${s.class}, Section ${s.section}, Table ${s.table}.`;
-        } else reply = "Roll number not found.";
-        return botReply(reply);
-    }
+  // helpful questions
+  if (lower.includes('upload') || lower.includes('excel') || lower.includes('seating') || lower.includes('template')) {
+    botReply('Teachers: click "Download Template" to get sample file or "Upload Seating Excel" to load seatings. Students: type your roll number (e.g., 1004).');
+    return;
+  }
 
-    for (const st in capitals) {
-        if (lower.includes(st)) {
-            reply = `The capital of ${st.toUpperCase()} is ${capitals[st]}.`;
-            return botReply(reply);
-        }
-    }
+  if (lower.includes('how many') && (lower.includes('row') || lower.includes('student') || lower.includes('students'))) {
+    if (excelRowsCount > 0) botReply('Currently loaded seating rows: ' + excelRowsCount + '.');
+    else botReply('No seating uploaded yet. Teachers should upload the seating Excel.');
+    return;
+  }
 
-    for (const key in answers) {
-        if (lower.includes(key)) {
-            reply = answers[key];
-            return botReply(reply);
-        }
-    }
+  if (["hi","hello","hey"].some(g => lower === g || lower.includes(g))) {
+    botReply('Hello! Upload seating (teachers) or type your roll number (students).');
+    return;
+  }
 
-    botReply("I'm not sure about that 🤔, but I'm learning!");
+  // fallback
+  botReply("I didn't catch that. Type your roll number (e.g., 1004) or upload the seating Excel (teachers).");
 }
 
-/* ADD MESSAGE ------------------------------------- */
+/* reply seat using seatingMap or fallback */
+function replySeatForRoll(normalizedRoll) {
+  if (!normalizedRoll) {
+    botReply('Please enter a valid roll number (e.g., 1004).');
+    return;
+  }
+
+  if (Object.keys(seatingMap).length > 0) {
+    if (seatingMap.hasOwnProperty(normalizedRoll)) {
+      const s = seatingMap[normalizedRoll];
+      botReply(`Roll No ${s.roll}: Floor ${s.floor}, Class ${s.class}, Section ${s.section}, Table ${s.table}.`);
+    } else {
+      botReply('Roll number ' + normalizedRoll + ' not found in uploaded seating. Please check with your teacher.');
+    }
+    return;
+  }
+
+  // fallback table
+  if (fallbackSeating.hasOwnProperty(normalizedRoll)) {
+    const s = fallbackSeating[normalizedRoll];
+    botReply(`Roll No ${normalizedRoll}: Floor ${s.floor}, Class ${s.class}, Section ${s.section}, Table ${s.table}. (From built-in seating)`);
+  } else {
+    botReply('Roll number ' + normalizedRoll + ' not found. Upload a seating Excel or check the roll number.');
+  }
+}
+
+/* helpers for UI interactions */
 function addMessage(text, sender) {
-    const msg = document.createElement("div");
-    msg.classList.add("chat-message", sender);
-    msg.innerText = text;
-    chatBox.appendChild(msg);
-    chatBox.scrollTop = chatBox.scrollHeight;
+  const msg = document.createElement('div');
+  msg.classList.add('chat-message', sender);
+  msg.innerText = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+/* ensure single addMessage function used (we used both definitions above) */
+window.addMessage = addMessage;
+
+/* wire send button */
+function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, 'user');
+  input.value = '';
+  processMessage(text);
 }
 
-/* BOT REPLY + SPEAK ------------------------------- */
-function botReply(text) {
-    addMessage(text, "bot");
-    speak(text);
-}
+/* attach enter key */
+const inputEl = document.getElementById('userInput');
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendMessage();
+});
 
-/* VOICE INPUT ------------------------------------- */
-function startListening() {
-    if (!('webkitSpeechRecognition' in window)) {
-        return alert("Voice input not supported.");
-    }
-    const recog = new webkitSpeechRecognition();
-    recog.lang = "en-IN";
-    recog.start();
+/* speech: make speak function available above */
 
-    recog.onresult = (e) => {
-        const speech = e.results[0][0].transcript;
-        addMessage("🎤 " + speech, "user");
-        processMessage(speech);
-    };
-}
-
-/* TEXT-TO-SPEECH ---------------------------------- */
-function speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "en-IN";
-    speechSynthesis.speak(utter);
-}
 </script>
 </body>
 </html>
